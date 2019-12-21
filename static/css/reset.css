@@ -1,0 +1,50 @@
+body{ margin: 0;padding: 0;font-family: "微软雅黑";}
+body,html{-webkit-text-size-adjust: none;width: 100%;height: 100%;}
+*{text-decoration: none;list-style: none;}
+img{border: 0px;}
+ul,li,dl,dd,dt,p,ol,h1,h2,h3,h4,h5{font-size: 12px;font-weight: 100;padding: 0;margin: 0;}
+.wrap{margin: 0 auto;}
+.fl{float: left;}
+.fr{float: right;}
+.index{overflow: hidden;}
+.clr{clear:both; height:0px; width:100%; font-size:1px; line-height:0px; visibility:hidden; overflow:hidden;}
+.pointer{cursor:pointer;}
+a,input,button{ outline:none; }
+::-moz-focus-inner{border:0px;}
+a{color: #000;}
+
+body, div, dl, dt, dd, ul, ol, li, h1,
+h2,h3,form,fieldset,input,textarea,p,blockquote,th,td { margin:0; padding:0; }
+ol,ul{
+  list-style: none;
+}
+/*左浮动*/
+.leftfloat{float: left;}
+/*右浮动*/
+.rightfloat{float: right;}
+/*链接字体颜色*/
+a{color: #646464;text-decoration:none;}
+/*清楚浮动*/
+.clearfix:after{content:"";display: block;clear: both;}
+.clearfix{zoom: 1;}
+.none{
+  display: none;
+}
+input,body,img{border: none;}
+/*提示窗口*/
+.el-message {
+  top: 20px !important;
+}
+/*newspaper Add*/
+.page{
+  padding: 0 30px;
+}
+body .el-table th.gutter{
+  display: table-cell!important;
+}
+.el-dialog__header{
+  border-bottom: 1px solid #e5e5e5;
+}
+.lineCase_cell_color{
+  color: #FF0000;
+}

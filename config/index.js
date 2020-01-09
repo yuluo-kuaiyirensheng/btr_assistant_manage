@@ -11,9 +11,9 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      //  http://39.107.42.175:8080/NewsSubscribe-0.0.1-SNAPSHOT
       '/api': {
-        target: 'http://kyrs.free.idcfengye.com/BtrAssistance/',
+        // target: 'http://kyrs.free.idcfengye.com/BtrAssistance/',
+        target: 'http://123.56.26.242:8080/BtrAssistant-0.0.1/',
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''     //路径重写，也可以写成 '^/api': 'http://f.apiplus.cn'

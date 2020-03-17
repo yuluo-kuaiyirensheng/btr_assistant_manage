@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api': {
-        // target: 'http://kyrs.free.idcfengye.com/BtrAssistance/',
+        // target: 'http://ylkyrs.free.idcfengye.com/BtrAssistance/',
         target: 'http://123.56.26.242:8080/BtrAssistant-0.0.1/',
         changeOrigin: true,
         pathRewrite: {
@@ -36,7 +36,7 @@ module.exports = {
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
 
-    
+
     /**
      * Source Maps
      */

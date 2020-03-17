@@ -140,23 +140,14 @@ export default {
     },
     async searchManagerList(data) {
       let res;
-      if(this.search) {
-        res = await searchManager({
-          page: {
-            page_number: this.currentPage,
-            row_count: this.pageSize
-          },
-          search_content: this.search
-        });
-      } else {
-        res = await listManager({
-          page: {
-            page_number: this.currentPage,
-            row_count: this.pageSize
-          },
-          search_content: this.search
-        });
-      }
+      res = await searchManager({
+        page: {
+          page_number: this.currentPage,
+          row_count: this.pageSize
+        },
+        search_content: this.search,
+        manager: this.$store.getters['getStorage'],
+      });
       if(res) {
         console.log(res);
         this.tableData = res.data.body.list;
@@ -170,8 +161,6 @@ export default {
       this.searchManagerList({});
     },
     operation(type, id) {
-      console.log(type)
-      console.log(id)
       if(type == 'edit') {
         this.$router.push('/dashboard/platform/manager/edit?type='+type+'&id='+id);
       } else if(type == 'detail') {

@@ -97,7 +97,7 @@
           </div>
           <div class="info">
             <el-select v-model="form_data.province" clearable placeholder="请选择"
-            style="width: 20%;min-width: 120px;">
+            style="width: 20%;min-width: 120px;" @change="changeProvince">
               <el-option
                 v-for="item in provinceList"
                 :key="item.value"
@@ -106,7 +106,7 @@
               </el-option>
             </el-select>
             <el-select v-model="form_data.city" clearable placeholder="请选择"
-            style="width: 20%;min-width: 120px;">
+            style="width: 20%;min-width: 120px;" @change="changeCity">
               <el-option
                 v-for="item in cityList"
                 :key="item.value"
@@ -152,6 +152,7 @@ import {messagePrompt} from "../../utils/PublicUtil";
 import {listRole, findRole} from "../../api/role";
 import {listInstitution} from "../../api/institution";
 import {addManager, findManager, updateManager} from "../../api/manager";
+import {listProvince, listCity, listArea} from "../../api/region";
 
 export default {
   name: "Add",
@@ -210,6 +211,9 @@ export default {
         sex: null,
         tel: '',
         email: '',
+        tempPro: null,
+        tempCity: null,
+        tempArea: null,
         province: null,
         city: null,
         area: null,
@@ -224,18 +228,36 @@ export default {
     OperateHint,
   },
   methods: {
+    async getProperty() {
+      this.provinceList.forEach((item) => {
+        if(item.value == this.form_data.province) {
+          this.form_data.tempPro = item.label;
+        }
+      });
+      this.cityList.forEach((item) => {
+        if(item.value == this.form_data.city) {
+          this.form_data.tempCity = item.label;
+        }
+      });
+      this.areaList.forEach((item) => {
+        if(item.value == this.form_data.area) {
+          this.form_data.tempArea = item.label;
+        }
+      });
+    },
     async saveManager() {
-      if(this.form_data.role && this.form_data.ins && this.form_data.name && this.form_data.account && this.form_data.password
+      if(this.form_data.role && this.form_data.name && this.form_data.account && this.form_data.password
         && this.form_data.sex && this.form_data.email && this.form_data.tel) {
+        await this.getProperty();
         if(!this.update) {
           let res = await addManager({
             username: this.form_data.account,
             password: this.form_data.password,
             identify_type_id: this.form_data.role,
             institution_id: this.form_data.ins,
-            province: this.form_data.province,
-            city: this.form_data.city,
-            area: this.form_data.area,
+            province: this.form_data.tempPro,
+            city: this.form_data.tempCity,
+            area: this.form_data.tempArea,
             name: this.form_data.name,
             sex: this.form_data.sex,
             phone: this.form_data.tel,
@@ -260,9 +282,9 @@ export default {
             password: this.form_data.password,
             identify_type_id: this.form_data.role,
             institution_id: this.form_data.ins,
-            province: this.form_data.province,
-            city: this.form_data.city,
-            area: this.form_data.area,
+            province: this.form_data.tempPro,
+            city: this.form_data.tempCity,
+            area: this.form_data.tempArea,
             name: this.form_data.name,
             sex: this.form_data.sex,
             phone: this.form_data.tel,
@@ -273,6 +295,13 @@ export default {
             console.log(res);
             if(res.data.code == 200) {
               if(res.data.body == 'OK') {
+                if(this.$store.getters['getStorage'].id == this.$route.query.id) {
+                  messagePrompt(this, '修改成功，请重新登录', 'success', 2000);
+                  this.$store.dispatch('removeStorage');
+                  this.$cookies.remove('passport');
+                  this.$router.push('/login');
+                  return;
+                }
                 messagePrompt(this, '修改成功', 'success', 2000);
                 this.$router.push('/dashboard/platform');
                 return;
@@ -282,8 +311,8 @@ export default {
           messagePrompt(this, '修改失败', 'error', 1000);
         }
       }
-      return;
       messagePrompt(this, '添加失败，请将信息填写完整', 'error', 1000);
+      return;
     },
     async changeRole() {
       if(this.form_data.role) {
@@ -293,6 +322,7 @@ export default {
         if(res) {
           if(res.data.code == 200) {
             if(res.data.body.role.type == 'admin') {
+              this.form_data.ins = null;
               this.disableIns = true;
             } else {
               this.disableIns = false;
@@ -331,14 +361,75 @@ export default {
         }
       }
     },
+    async changeProvince() {
+      this.cityList = [
+        {
+          label: '请选择市',
+          value: null,
+        }
+      ];
+      this.form_data.city = null;
+      this.areaList = [
+        {
+          label: '请选择区',
+          value: null,
+        }
+      ];
+      this.form_data.area = null;
+      if(this.form_data.province) {
+        await this.listCity();
+      }
+    },
     async listProvince() {
+      let res = await listProvince({
 
+      })
+      if(res && res.data.message == 'query ok') {
+        res.data.result[0].forEach((item) => {
+          this.provinceList.push({
+            label: item.fullname,
+            value: item.id,
+          });
+        })
+      }
+    },
+    async changeCity() {
+      this.areaList = [
+        {
+          label: '请选择区',
+          value: null,
+        }
+      ];
+      this.form_data.area = null;
+      if(this.form_data.city) {
+        await this.listArea();
+      }
     },
     async listCity() {
-
+      let res = await listCity({
+        id: this.form_data.province,
+      })
+      if(res && res.data.message == 'query ok') {
+        res.data.result[0].forEach((item) => {
+          this.cityList.push({
+            label: item.fullname,
+            value: item.id,
+          })
+        })
+      }
     },
     async listArea() {
-
+      let res = await listArea({
+        id: this.form_data.city,
+      })
+      if(res && res.data.message == 'query ok') {
+        res.data.result[0].forEach((item) => {
+          this.areaList.push({
+            label: item.fullname,
+            value: item.id,
+          })
+        })
+      }
     },
     async setManager(id) {
       let res = await findManager({
@@ -347,16 +438,33 @@ export default {
       if(res) {
         if(res.data.code == 200) {
           this.form_data.role = res.data.body.identify_type.id;
-          this.form_data.ins = res.data.body.institution.id;
+          this.disableIns = res.data.body.identify_type.type=='admin'?true:false;
+          this.form_data.ins = res.data.body.institution_id?res.data.body.institution.id:null;
           this.form_data.name = res.data.body.name;
           this.form_data.account = res.data.body.username;
           this.form_data.password = res.data.body.password;
           this.form_data.sex = res.data.body.sex;
           this.form_data.tel = res.data.body.phone;
           this.form_data.email = res.data.body.email;
-          this.form_data.province = res.data.body.province;
-          this.form_data.city = res.data.body.city;
-          this.form_data.area = res.data.body.area;
+          if(res.data.body.province) {
+            this.provinceList.forEach((item) => {
+              if(item.label == res.data.body.province) {
+                this.form_data.province = item.value;
+              }
+            })
+            await this.listCity();
+            this.cityList.forEach((item) => {
+              if(item.label == res.data.body.city) {
+                this.form_data.city = item.value;
+              }
+            })
+            await this.listArea();
+            this.areaList.forEach((item) => {
+              if(item.label == res.data.body.area) {
+                this.form_data.area = item.value;
+              }
+            })
+          }
           this.form_data.info = res.data.body.info;
         }
       }
@@ -365,6 +473,7 @@ export default {
   async mounted() {
     await this.listRole();
     await this.listIns();
+    await this.listProvince();
     if(this.$route.query.type && this.$route.query.id) {
       if(this.$route.query.type == 'detail') {
         this.showSub = false

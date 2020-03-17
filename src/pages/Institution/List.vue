@@ -4,7 +4,8 @@
       <div class="company_wrapper">
         <div class="wrapper_head">
           <el-button type="danger" plain size="small"
-                     icon="el-icon-plus" @click="addInstitution">添加机构</el-button>
+                     icon="el-icon-plus" @click="addInstitution"
+                     v-if="$store.getters['getStorage'].identify_type.type == 'admin'">添加机构</el-button>
           <el-input v-model="search" placeholder="试搜索一下" style="width: 200px;"></el-input>
           <el-button type="warning" @click="searchData">搜索一下</el-button>
         </div>
@@ -39,6 +40,15 @@
               label="机构名称"
               min-width="1"
               fit>
+            </af-table-column>
+            <af-table-column
+              fixed
+              label="机构logo"
+              width="150"
+              fit>
+              <template slot-scope="scope" v-if="scope.row.logo_url">
+                  <img :src="'api/upload/'+scope.row.logo_url" alt="" style="width:100px;height:100px;">
+              </template>
             </af-table-column>
             <af-table-column
               label="机构地址"
@@ -86,7 +96,7 @@
               <template slot-scope="scope">
                 <el-button @click="" type="text" size="small" @click="operation('detail', scope.row.id)">查看</el-button>
                 <el-button type="text" size="small" @click="operation('edit', scope.row.id)">编辑</el-button>
-                <el-button type="text" size="small">删除</el-button>
+                <el-button type="text" size="small" v-if="$store.getters['getStorage'].identify_type.type == 'admin'">删除</el-button>
               </template>
             </af-table-column>
           </el-table>
@@ -108,7 +118,7 @@
 
 <script>
 import OperateHint from '../../components/operatehint'
-import {listInstitution, searchInstitution} from "../../api/institution";
+import {listInstitution} from "../../api/institution";
 
 export default {
   name: "List",
@@ -147,22 +157,16 @@ export default {
     },
     async searchInstitutionList() {
       let res;
-      if(this.search) {
-        res = await searchInstitution({
-          page: {
-            page_number: this.currentPage,
-            row_count: this.pageSize,
-          },
-          search_content: this.search,
-        });
-      } else {
-        res = await listInstitution({
-          page: {
-            page_number: this.currentPage,
-            row_count: this.pageSize,
-          }
-        });
-      }
+      res = await listInstitution({
+        page: {
+          page_number: this.currentPage,
+          row_count: this.pageSize,
+        },
+        manager: {
+          id: this.$store.getters['getStorage'].identify_type.type == 'admin'?null:this.$store.getters['getStorage'].id
+        },
+        search_content: this.search,
+      });
 
       if(res) {
         console.log(res);

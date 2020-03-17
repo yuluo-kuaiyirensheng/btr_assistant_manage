@@ -22,6 +22,7 @@ import {
   FormItem,
   Table,
   TableColumn,
+  Upload,
   Link,
   Dialog,
   Select,
@@ -46,6 +47,7 @@ Vue.use(Button);
 Vue.use(Form);
 Vue.use(Table);
 Vue.use(TableColumn);
+Vue.use(Upload);
 Vue.use(Link);
 Vue.use(Dialog);
 Vue.use(Select);

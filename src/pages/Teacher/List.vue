@@ -3,12 +3,15 @@
       <OperateHint prompt="操作提示" content="助教列表：管理各助教信息"></OperateHint>
       <div class="company_wrapper">
         <div class="wrapper_head">
-          <el-select v-model="ins" placeholder="请选择">
+          <el-button type="danger" plain size="small"
+                     icon="el-icon-plus" @click="addTeacher"
+                     v-if="$store.getters['getStorage'].identify_type.type != 'admin'">添加助教</el-button>
+          <el-select v-model="ins" placeholder="请选择" :disabled="$store.getters['getStorage'].identify_type.type!='admin'">
             <el-option
               v-for="item in insList"
               :key="item.value"
               :label="item.label"
-              :value="item.value" @change="changeIns">
+              :value="item.value">
             </el-option>
           </el-select>
           <el-input v-model="search" placeholder="试搜索一下" style="width: 200px;"></el-input>
@@ -47,6 +50,17 @@
               fit>
             </af-table-column>
             <af-table-column
+              fixed
+              prop="name"
+              label="助教头像"
+              width="120"
+              fit
+              align="center">
+              <template slot-scope="scope" v-if="scope.row.portrait_url">
+                <img :src="'api/upload/'+scope.row.portrait_url" style="width:100px;height:100px;">
+              </template>
+            </af-table-column>
+            <af-table-column
               prop="institution.name"
               label="所属机构"
               min-width="1"
@@ -64,8 +78,8 @@
               width="180"
               fit>
               <template slot-scope="scope" v-if="$store.getters['getStorage'].identify_type.type == 'branchManager'">
-                <el-button @click="" type="text" size="small">查看</el-button>
-                <el-button type="text" size="small">编辑</el-button>
+                <el-button @click="" type="text" size="small" @click="operation('detail', scope.row.id)">查看</el-button>
+                <el-button type="text" size="small" @click="operation('edit', scope.row.id)">编辑</el-button>
                 <el-button type="text" size="small">删除</el-button>
               </template>
             </af-table-column>
@@ -130,8 +144,8 @@ export default {
       this.loading = true;
       this.searchTeacherList();
     },
-    addManager() {
-      this.$router.push('/dashboard/platform/manager/add');
+    addTeacher() {
+      this.$router.push('/dashboard/teacher/add');
     },
     async listIns() {
       let res = await listInstitution({});
@@ -147,35 +161,20 @@ export default {
         }
       }
     },
-    changeIns() {
-      if(this.ins) {
-        this.currentPage = 1;
-      }
-    },
     async searchTeacherList() {
-      let res;
-      if(this.search) {
-        this.currentPage = 1;
-      }
-      if(this.search || this.ins) {
-        res = await searchTeacher({
-          page: {
-            page_number: this.currentPage,
-            row_count: this.pageSize,
-          },
-          search_content: this.search,
-          teacher: {
-            institution_id: this.ins,
-          }
-        });
-      } else {
-        res = await listTeacher({
-          page: {
-            page_number: this.currentPage,
-            row_count: this.pageSize,
-          },
-        });
-      }
+      let res = await listTeacher({
+        page: {
+          page_number: this.currentPage,
+          row_count: this.pageSize,
+        },
+        search_content: this.search,
+        teacher: {
+          institution_id: this.ins,
+        },
+        manager: {
+          id: this.$store.getters['getStorage'].identify_type.type == 'admin'?null:this.$store.getters['getStorage'].id
+        }
+      });
       if(res) {
         console.log(res);
         if(res.data.code == 200) {
@@ -187,12 +186,21 @@ export default {
     },
     searchData() {
       this.loading = true;
+      this.currentPage = 1;
       this.searchTeacherList();
     },
+    operation(type, id) {
+      if(type == 'detail') {
+        this.$router.push('/dashboard/teacher/add?type='+type+'&id='+id);
+      } else if(type == 'edit') {
+        this.$router.push('/dashboard/teacher/edit?type='+type+'&id='+id);
+      }
+    }
   },
-  mounted() {
-    this.listIns();
-    this.searchTeacherList();
+  async mounted() {
+    await this.listIns();
+    this.ins = this.$store.getters['getStorage'].identify_type.type == 'admin'?null:this.$store.getters['getStorage'].institution_id;
+    await this.searchTeacherList();
   }
 }
 </script>

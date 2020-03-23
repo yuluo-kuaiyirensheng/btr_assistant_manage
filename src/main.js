@@ -29,6 +29,7 @@ import {
   Option,
   Pagination,
   DatePicker,
+  TimePicker,
   Loading,
   Message,
   MessageBox,
@@ -56,6 +57,7 @@ Vue.use(Pagination);
 Vue.use(FormItem);
 Vue.use(Loading);
 Vue.use(DatePicker);
+Vue.use(TimePicker);
 
 Vue.prototype.$message = Message;
 Vue.prototype.$msgbox = MessageBox;

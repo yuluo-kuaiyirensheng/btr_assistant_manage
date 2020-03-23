@@ -6,7 +6,7 @@
       </div>
       <div class="manager_info_bar" @mouseenter="isHover=true" @mouseleave="isHover=false">
         <div class="info_logo">
-          系统管理员
+          {{this.$store.getters['getStorage'].identify_type.name}}
           <i :class="!isHover?'el-icon-user':'el-icon-user-solid'"></i>
         </div>
         <div class="info">

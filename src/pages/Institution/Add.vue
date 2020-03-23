@@ -445,7 +445,7 @@ export default {
         console.log(res);
         if(res.data.code == 200) {
           this.form_data.name = res.data.body.name;
-          this.form_data.logo_url = res.data.body.logo_url;
+          this.form_data.logo_url = res.data.body.logo_url?res.data.body.logo_url:'';
           this.form_data.account = res.data.body.list[0].username;
           this.form_data.password = res.data.body.list[0].password;
           this.form_data.info = res.data.body.info;

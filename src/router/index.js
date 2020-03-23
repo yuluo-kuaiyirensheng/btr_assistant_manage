@@ -14,9 +14,11 @@ import RoleList from '../pages/IdentifyType/List'
 
 import Teacher from '../pages/Teacher/Teacher'
 import TeacherList from '../pages/Teacher/List'
+import AddTeacher from '../pages/Teacher/Add'
 
 import Class from '../pages/Class/Class'
 import ClassList from '../pages/Class/List'
+import AddClass from '../pages/Class/Add'
 
 import Student from '../pages/Student/Student'
 import StudentList from '../pages/Student/List'
@@ -148,6 +150,30 @@ export default new Router({
                 selectedOpt: 1
               }
             },
+            {
+              path: 'add',
+              name: '添加助教',
+              component: AddTeacher,
+              meta: {
+                selectedOpt: 1
+              }
+            },
+            {
+              path: 'edit',
+              name: '修改助教',
+              component: AddTeacher,
+              meta: {
+                selectedOpt: 1
+              }
+            },
+            {
+              path: 'detail',
+              name: '查看助教',
+              component: AddTeacher,
+              meta: {
+                selectedOpt: 1
+              }
+            },
           ]
         },
         {
@@ -163,6 +189,30 @@ export default new Router({
               path: 'list',
               name: '班级列表',
               component: ClassList,
+              meta: {
+                selectedOpt: 1
+              }
+            },
+            {
+              path: 'add',
+              name: '添加班级',
+              component: AddClass,
+              meta: {
+                selectedOpt: 1
+              }
+            },
+            {
+              path: 'edit',
+              name: '修改班级',
+              component: AddClass,
+              meta: {
+                selectedOpt: 1
+              }
+            },
+            {
+              path: 'detail',
+              name: '查看班级',
+              component: AddClass,
               meta: {
                 selectedOpt: 1
               }

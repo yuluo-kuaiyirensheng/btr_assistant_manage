@@ -4,6 +4,14 @@ export function listTeacher(data) {
   return post('api/teacher/list', data);
 }
 
-export function searchTeacher(data) {
-  return post('api/teacher/search', data);
+export function addTeacher(data) {
+  return post('api/teacher/add', data);
+}
+
+export function updateTeacher(data) {
+  return post('api/teacher/update', data);
+}
+
+export function findTeacher(data) {
+  return fetch('api/teacher/detail', data);
 }

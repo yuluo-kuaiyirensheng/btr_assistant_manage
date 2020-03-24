@@ -80,7 +80,6 @@
               :picker-options="{
                 selectableRange: '00:00:00 - 23:59:59'
               }"
-              value-format="HH:mm:ss"
               placeholder="任意时间点" style="display: flex;align-items: center;">
             </el-time-picker>
           </div>
@@ -95,7 +94,6 @@
               :picker-options="{
                 selectableRange: '00:00:00 - 23:59:59'
               }"
-              value-format="HH:mm:ss"
               placeholder="任意时间点" style="display: flex;align-items: center;">
             </el-time-picker>
           </div>
@@ -415,8 +413,8 @@ export default {
             student_number: this.form_data.studentNum,
             taught_lesson_hour: this.form_data.taughtLessonHour,
             total_lesson_hour: this.form_data.totalLessonHour,
-            start_time: this.form_data.startTime,
-            end_time: this.form_data.endTime,
+            start_time: new Date(this.form_data.startTime).getHours()+':'+new Date(this.form_data.startTime).getMinutes()+':'+new Date(this.form_data.startTime).getSeconds(),
+            end_time: new Date(this.form_data.endTime).getHours()+':'+new Date(this.form_data.endTime).getMinutes()+':'+new Date(this.form_data.endTime).getSeconds(),
             institution_id: this.$store.getters['getStorage'].institution_id,
           });
           if(res) {
@@ -438,8 +436,8 @@ export default {
             student_number: this.form_data.studentNum,
             taught_lesson_hour: this.form_data.taughtLessonHour,
             total_lesson_hour: this.form_data.totalLessonHour,
-            start_time: this.form_data.startTime,
-            end_time: this.form_data.endTime,
+            start_time: new Date(this.form_data.startTime).getHours()+':'+new Date(this.form_data.startTime).getMinutes()+':'+new Date(this.form_data.startTime).getSeconds(),
+            end_time: new Date(this.form_data.endTime).getHours()+':'+new Date(this.form_data.endTime).getMinutes()+':'+new Date(this.form_data.endTime).getSeconds(),
             institution_id: this.$store.getters['getStorage'].institution_id,
           });
 

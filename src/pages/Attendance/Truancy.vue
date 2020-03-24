@@ -3,7 +3,7 @@
     <OperateHint prompt="操作提示" content="考勤数据列表：管理各个机构所有旷课数据"></OperateHint>
     <div class="company_wrapper">
       <div class="wrapper_head">
-        <el-select v-model="form_data.ins" placeholder="请选择" @change="changeIns">
+        <el-select v-model="form_data.ins" placeholder="请选择" :disabled="$store.getters['getStorage'].identify_type.type!='admin'">
           <el-option
             v-for="item in insList"
             :key="item.value"
@@ -11,7 +11,7 @@
             :value="item.value">
           </el-option>
         </el-select>
-        <el-select v-model="form_data.type" placeholder="请选择" @change="changeType">
+        <el-select v-model="form_data.type" placeholder="请选择">
           <el-option
             v-for="item in typeList"
             :key="item.value"
@@ -19,7 +19,7 @@
             :value="item.value">
           </el-option>
         </el-select>
-        <el-select v-model="form_data.teacher" placeholder="请选择" @change="changeTeacher">
+        <el-select v-model="form_data.teacher" placeholder="请选择">
           <el-option
             v-for="item in teacherList"
             :key="item.value"
@@ -122,8 +122,8 @@
             width="180"
             fit>
             <template slot-scope="scope" v-if="$store.getters['getStorage'].identify_type.type == 'branchManager'">
-              <el-button @click="" type="text" size="small">查看</el-button>
-              <el-button type="text" size="small">编辑</el-button>
+              <el-button @click="" type="text" size="small" @click="operation('detail', scope.row.id)">查看</el-button>
+              <el-button type="text" size="small" @click="operation('edit', scope.row.id)">编辑</el-button>
               <el-button type="text" size="small">删除</el-button>
             </template>
           </af-table-column>
@@ -146,7 +146,7 @@
 
 <script>
 import OperateHint from '../../components/operatehint'
-import {searchStudentAttendance} from "../../api/studentAttendance";
+import {listStudentAttendance} from "../../api/studentAttendance";
 import {listInstitution} from "../../api/institution";
 import {listClassType} from "../../api/classType";
 import {listTeacher} from "../../api/teacher";
@@ -209,7 +209,7 @@ export default {
       this.$router.push('/dashboard/platform/manager/add');
     },
     async searchStudentAttendanceList() {
-      let res = await searchStudentAttendance({
+      let res = await listStudentAttendance({
         page: {
           page_number: this.currentPage,
           row_count: this.pageSize,
@@ -253,12 +253,11 @@ export default {
         }
       }
     },
-    changeIns() {
-      this.currentPage = 1;
-    },
     async listTeacher() {
       let res = await listTeacher({
-
+        teacher: {
+          institution_id: this.$store.getters['getStorage'].institution_id,
+        }
       });
       if(res) {
         if(res.data.code == 200) {
@@ -270,9 +269,6 @@ export default {
           });
         }
       }
-    },
-    changeTeacher() {
-      this.currentPage = 1;
     },
     async listClassType() {
       let res = await listClassType({
@@ -289,15 +285,20 @@ export default {
         }
       }
     },
-    changeType() {
-      this.currentPage = 1;
+    operation(type, id) {
+      if(type == 'detail') {
+        this.$router.push('/dashboard/attendance/detail?type='+type+'&id='+id);
+      } else if(type == 'edit') {
+        this.$router.push('/dashboard/attendance/edit?type='+type+'&id='+id);
+      }
     },
   },
-  mounted() {
-    this.listIns();
-    this.listClassType();
-    this.listTeacher();
-    this.searchStudentAttendanceList();
+  async mounted() {
+    await this.listIns();
+    this.form_data.ins = this.$store.getters['getStorage'].institution_id;
+    await this.listClassType();
+    await this.listTeacher();
+    await this.searchStudentAttendanceList();
   },
 }
 </script>

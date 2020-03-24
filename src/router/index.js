@@ -22,11 +22,13 @@ import AddClass from '../pages/Class/Add'
 
 import Student from '../pages/Student/Student'
 import StudentList from '../pages/Student/List'
+import AddStudent from '../pages/Student/Add'
 
 import Attendance from '../pages/Attendance/Attendance'
 import AttendanceList from '../pages/Attendance/List'
 import Leave from '../pages/Attendance/Leave'
 import Truancy from '../pages/Attendance/Truancy'
+import AddAttendance from '../pages/Attendance/Add'
 
 Vue.use(Router)
 
@@ -236,6 +238,30 @@ export default new Router({
                 selectedOpt: 1
               }
             },
+            {
+              path: 'add',
+              name: '添加学生',
+              component: AddStudent,
+              meta: {
+                selectedOpt: 1
+              }
+            },
+            {
+              path: 'edit',
+              name: '修改学生',
+              component: AddStudent,
+              meta: {
+                selectedOpt: 1
+              }
+            },
+            {
+              path: 'detail',
+              name: '查看学生',
+              component: AddStudent,
+              meta: {
+                selectedOpt: 1
+              }
+            },
           ]
         },
         {
@@ -252,16 +278,33 @@ export default new Router({
               name: '全部考勤',
               component: AttendanceList,
               meta: {
-                selectedOpt: 1
+                selectedOpt: 1,
+                type: null,
               }
-
+            },
+            {
+              path: 'edit',
+              name: '修改考勤',
+              component: AddAttendance,
+              meta: {
+                selectedOpt: 1,
+              }
+            },
+            {
+              path: 'detail',
+              name: '查看考勤',
+              component: AddAttendance,
+              meta: {
+                selectedOpt: 1,
+              }
             },
             {
               path: 'leave/list',
               name: '请假',
               component: Leave,
               meta: {
-                selectedOpt: 2
+                selectedOpt: 2,
+                type: 'leave',
               }
             },
             {
@@ -269,7 +312,8 @@ export default new Router({
               name: '旷课',
               component: Truancy,
               meta: {
-                selectedOpt: 3
+                selectedOpt: 3,
+                type: 'truancy',
               }
             },
           ]

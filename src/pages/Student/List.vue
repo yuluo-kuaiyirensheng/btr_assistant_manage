@@ -3,7 +3,10 @@
       <OperateHint prompt="操作提示" content="学生数据列表：管理各机构所有学生。"></OperateHint>
       <div class="company_wrapper">
         <div class="wrapper_head">
-          <el-select v-model="form_data.ins" placeholder="请选择" @change="changeIns">
+          <el-button type="danger" plain size="small"
+                     icon="el-icon-plus" @click="addStudent"
+                     v-if="$store.getters['getStorage'].identify_type.type != 'admin'">添加助教</el-button>
+          <el-select v-model="form_data.ins" placeholder="请选择" :disabled="$store.getters['getStorage'].identify_type.type!='admin'">
             <el-option
               v-for="item in insList"
               :key="item.value"
@@ -11,7 +14,7 @@
               :value="item.value">
             </el-option>
           </el-select>
-          <el-select v-model="form_data.type" placeholder="请选择" @change="changeType">
+          <el-select v-model="form_data.type" placeholder="请选择">
             <el-option
               v-for="item in typeList"
               :key="item.value"
@@ -19,7 +22,7 @@
               :value="item.value">
             </el-option>
           </el-select>
-          <el-select v-model="form_data.teacher" placeholder="请选择" @change="changeTeacher">
+          <el-select v-model="form_data.teacher" placeholder="请选择">
             <el-option
               v-for="item in teacherList"
               :key="item.value"
@@ -77,39 +80,6 @@
               align="center"
               fit>
             </af-table-column>
-<!--            <af-table-column-->
-<!--              prop="type"-->
-<!--              label="班级类型"-->
-<!--              width="150"-->
-<!--              align="center"-->
-<!--              fit>-->
-<!--            </af-table-column>-->
-<!--            <af-table-column-->
-<!--              prop="class_number"-->
-<!--              label="班级号"-->
-<!--              width="70"-->
-<!--              align="center"-->
-<!--              fit>-->
-<!--            </af-table-column>-->
-<!--            <af-table-column-->
-<!--              prop="student_number"-->
-<!--              label="班级人数"-->
-<!--              width="100"-->
-<!--              align="center"-->
-<!--              fit>-->
-<!--            </af-table-column>-->
-<!--            <af-table-column-->
-<!--              prop="teacher_name"-->
-<!--              label="指导助教"-->
-<!--              min-width="1"-->
-<!--              fit>-->
-<!--            </af-table-column>-->
-<!--            <af-table-column-->
-<!--              prop="teacher_tel"-->
-<!--              label="助教电话"-->
-<!--              width="200"-->
-<!--              fit>-->
-<!--            </af-table-column>-->
             <af-table-column
               prop="institution.name"
               label="所属机构"
@@ -122,8 +92,8 @@
               width="180"
               fit>
               <template slot-scope="scope" v-if="$store.getters['getStorage'].identify_type.type == 'branchManager'">
-                <el-button @click="" type="text" size="small">查看</el-button>
-                <el-button type="text" size="small">编辑</el-button>
+                <el-button @click="" type="text" size="small" @click="operation('detail', scope.row.id)">查看</el-button>
+                <el-button type="text" size="small" @click="operation('edit', scope.row.id)">编辑</el-button>
                 <el-button type="text" size="small">删除</el-button>
               </template>
             </af-table-column>
@@ -146,7 +116,7 @@
 
 <script>
 import OperateHint from '../../components/operatehint'
-import {listStudent, searchStudent} from "../../api/student";
+import {listStudent} from "../../api/student";
 import {listInstitution} from "../../api/institution";
 import {listTeacher} from "../../api/teacher";
 import {listClassType} from "../../api/classType";
@@ -208,37 +178,26 @@ export default {
       this.currentPage = val;
       this.searchStudentList();
     },
-    addManager() {
-      this.$router.push('/dashboard/platform/manager/add');
+    addStudent() {
+      this.$router.push('/dashboard/student/add');
     },
     async searchStudentList() {
-      let res;
-      if(this.form_data.search || this.form_data.ins || this.form_data.type || this.form_data.teacher) {
-        res = await searchStudent({
-          page: {
-            page_number: this.currentPage,
-            row_count: this.pageSize,
-          },
-          search_content: this.form_data.search,
-          student: {
-            institution_id: this.form_data.ins,
-          },
-          cls: {
-            class_type_id: this.form_data.type,
-          },
-          teacher: {
-            id: this.form_data.teacher,
-          }
-        });
-      } else {
-        res = await listStudent({
-          page: {
-            page_number: this.currentPage,
-            row_count: this.pageSize,
-          }
-        });
-      }
-
+      let res = await listStudent({
+        page: {
+          page_number: this.currentPage,
+          row_count: this.pageSize,
+        },
+        search_content: this.form_data.search,
+        student: {
+          institution_id: this.form_data.ins,
+        },
+        cls: {
+          class_type_id: this.form_data.type,
+        },
+        teacher: {
+          id: this.form_data.teacher,
+        }
+      });
       if(res) {
         if(res.data.code == 200) {
           this.tableData = res.data.body.list;
@@ -265,12 +224,11 @@ export default {
         }
       }
     },
-    changeIns() {
-      this.currentPage = 1;
-    },
     async listTeacher() {
       let res = await listTeacher({
-
+        teacher: {
+          institution_id: this.$store.getters['getStorage'].institution_id,
+        }
       });
       if(res) {
         if(res.data.code == 200) {
@@ -282,9 +240,6 @@ export default {
           });
         }
       }
-    },
-    changeTeacher() {
-      this.currentPage = 1;
     },
     async listClassType() {
       let res = await listClassType({
@@ -301,17 +256,21 @@ export default {
         }
       }
     },
-    changeType() {
-      this.currentPage = 1;
-    },
+    operation(type, id) {
+      if(type == 'detail') {
+        this.$router.push('/dashboard/student/add?type='+type+'&id='+id);
+      } else if(type == 'edit') {
+        this.$router.push('/dashboard/student/edit?type='+type+'&id='+id);
+      }
+    }
   },
-  mounted() {
-    this.listIns();
-    this.listClassType();
-    this.listTeacher();
-    this.searchStudentList();
+  async mounted() {
+    await this.listIns();
+    this.form_data.ins = this.$store.getters['getStorage'].identify_type.type == 'admin'?null:this.$store.getters['getStorage'].institution_id;
+    await this.listClassType();
+    await this.listTeacher();
+    await this.searchStudentList();
   },
-
 }
 </script>
 

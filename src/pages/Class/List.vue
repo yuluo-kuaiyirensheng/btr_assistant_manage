@@ -3,7 +3,10 @@
       <OperateHint prompt="操作提示" content="班级数据列表：管理各班级信息"></OperateHint>
       <div class="company_wrapper">
         <div class="wrapper_head">
-          <el-select v-model="form_data.ins" placeholder="请选择" @change="changeIns">
+          <el-button type="danger" plain size="small"
+                     icon="el-icon-plus" @click="addClass"
+                     v-if="$store.getters['getStorage'].identify_type.type != 'admin'">添加班级</el-button>
+          <el-select v-model="form_data.ins" placeholder="请选择" :disabled="$store.getters['getStorage'].identify_type.type!='admin'">
             <el-option
               v-for="item in insList"
               :key="item.value"
@@ -11,7 +14,7 @@
               :value="item.value">
             </el-option>
           </el-select>
-          <el-select v-model="form_data.type" placeholder="请选择" @change="changeType">
+          <el-select v-model="form_data.type" placeholder="请选择">
             <el-option
               v-for="item in typeList"
               :key="item.value"
@@ -19,7 +22,7 @@
               :value="item.value">
             </el-option>
           </el-select>
-          <el-select v-model="form_data.teacher" placeholder="请选择" @change="changeTeacher">
+          <el-select v-model="form_data.teacher" placeholder="请选择">
             <el-option
               v-for="item in teacherList"
               :key="item.value"
@@ -87,13 +90,13 @@
             <af-table-column
               prop="teachers[0].phone"
               label="助教电话"
-              width="200"
+              width="150"
               fit>
             </af-table-column>
             <af-table-column
               prop="institution.name"
               label="所属机构"
-              min-width="1"
+              width="200"
               fit>
             </af-table-column>
             <af-table-column
@@ -102,8 +105,8 @@
               width="180"
               fit>
               <template slot-scope="scope" v-if="$store.getters['getStorage'].identify_type.type == 'branchManager'">
-                <el-button @click="" type="text" size="small">查看</el-button>
-                <el-button type="text" size="small">编辑</el-button>
+                <el-button @click="" type="text" size="small" @click="operation('detail', scope.row.id)">查看</el-button>
+                <el-button type="text" size="small" @click="operation('edit', scope.row.id)">编辑</el-button>
                 <el-button type="text" size="small">删除</el-button>
               </template>
             </af-table-column>
@@ -186,49 +189,8 @@ export default {
       this.currentPage = val;
       this.searchClassList();
     },
-    addManager() {
-      this.$router.push('/dashboard/platform/manager/add');
-    },
-    async searchClassList() {
-      let res;
-      if(this.form_data.search || this.form_data.ins || this.form_data.class || this.form_data.teacher) {
-        res = await searchClass({
-          page: {
-            page_number: this.currentPage,
-            row_count: this.pageSize,
-          },
-          search_content: this.form_data.search,
-          cls: {
-            class_type_id: this.form_data.type,
-            institution_id: this.form_data.ins,
-            teachers: [
-              {
-                id: this.form_data.teacher,
-              }
-            ]
-          }
-        });
-      } else {
-        res = await listClass({
-          page: {
-            page_number: this.currentPage,
-            row_count: this.pageSize,
-          }
-        });
-      }
-
-      if(res) {
-        if(res.data.code == 200) {
-          this.tableData = res.data.body.list;
-          this.total = res.data.body.total;
-          this.loading = false;
-        }
-      }
-    },
-    searchData() {
-      this.currentPage = 1;
-      this.loading = true;
-      this.searchClassList();
+    addClass() {
+      this.$router.push('/dashboard/class/add');
     },
     async listIns() {
       let res = await listInstitution({});
@@ -243,12 +205,11 @@ export default {
         }
       }
     },
-    changeIns() {
-      this.currentPage = 1;
-    },
     async listTeacher() {
       let res = await listTeacher({
-
+        teacher: {
+          institution_id: this.$store.getters['getStorage'].institution_id,
+        }
       });
       if(res) {
         if(res.data.code == 200) {
@@ -260,9 +221,6 @@ export default {
           });
         }
       }
-    },
-    changeTeacher() {
-      this.currentPage = 1;
     },
     async listClassType() {
       let res = await listClassType({
@@ -279,15 +237,48 @@ export default {
         }
       }
     },
-    changeType() {
-      this.currentPage = 1;
+    async searchClassList() {
+      let res = await listClass({
+        page: {
+          page_number: this.currentPage,
+          row_count: this.pageSize,
+        },
+        search_content: this.form_data.search,
+        cls: {
+          class_type_id: this.form_data.type,
+          institution_id: this.form_data.ins,
+        },
+        teacher: {
+          id: this.form_data.teacher,
+        }
+      })
+      if(res) {
+        if(res.data.code == 200) {
+          this.tableData = res.data.body.list;
+          this.total = res.data.body.total;
+          this.loading = false;
+        }
+      }
     },
+    searchData() {
+      this.currentPage = 1;
+      this.loading = true;
+      this.searchClassList();
+    },
+    operation(type, id) {
+      if(type == 'detail') {
+        this.$router.push('/dashboard/class/add?type='+type+'&id='+id);
+      } else if(type == 'edit') {
+        this.$router.push('/dashboard/class/edit?type='+type+'&id='+id);
+      }
+    }
   },
-  mounted() {
-    this.listIns();
-    this.listClassType();
-    this.listTeacher();
-    this.searchClassList();
+  async mounted() {
+    await this.listIns();
+    await this.listClassType();
+    await this.listTeacher();
+    this.form_data.ins = this.$store.getters['getStorage'].identify_type.type=='admin'?null:this.$store.getters['getStorage'].institution_id;
+    await this.searchClassList();
   }
 }
 </script>

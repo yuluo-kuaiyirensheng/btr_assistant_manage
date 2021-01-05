@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "af-table-column": "^1.0.3",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "element-ui": "^2.12.0",
     "vue": "^2.5.2",
     "vue-cookies": "^1.5.13",
